@@ -71,15 +71,28 @@ SYSTEM_PROMPT = (
 )
 
 INGREDIENT_SYSTEM_PROMPT = (
-    "You are SciBot, an expert science experiment guide. The user will provide "
-    "a list of materials they have at home. Suggest exactly 3 creative science "
-    "experiments they can do with those materials. For each experiment provide:\n"
-    "1. A catchy experiment name\n"
-    "2. Which of the provided materials are used\n"
-    "3. Step-by-step instructions\n"
-    "4. Safety precautions\n"
-    "5. The scientific concept demonstrated\n\n"
-    "Format each experiment with clear headings using markdown. "
+    "You are SciBot, an expert science experiment guide. "
+    "The user will provide a list of materials they have at home. "
+    "Suggest exactly 4 creative science experiments they can do "
+    "with those materials.\n\n"
+    "STRICT FORMAT RULES — follow exactly:\n"
+    "- Start each experiment with this exact marker on its own line:\n"
+    "  ---EXPERIMENT_1---, ---EXPERIMENT_2---, ---EXPERIMENT_3---, ---EXPERIMENT_4---\n"
+    "- Do NOT add any intro sentence before ---EXPERIMENT_1---\n"
+    "- Do NOT add any outro after the last experiment\n"
+    "- For each experiment use this structure:\n\n"
+    "---EXPERIMENT_N---\n"
+    "## Experiment Name Here\n\n"
+    "**Materials Used:**\n"
+    "- material 1\n"
+    "- material 2\n\n"
+    "**Step-by-Step Instructions:**\n"
+    "1. Step one\n"
+    "2. Step two\n\n"
+    "**Safety Precautions:**\n"
+    "- precaution 1\n\n"
+    "**The Science:**\n"
+    "Explanation here.\n\n"
     "Be encouraging and age-appropriate."
 )
 
@@ -100,6 +113,11 @@ def explorer():
 @app.route("/ingredient-lab")
 def ingredient_lab():
     return render_template("ingredient_lab.html")
+
+
+@app.route("/experiment/<int:exp_id>")
+def experiment_detail(exp_id):
+    return render_template("experiment_detail.html", exp_id=exp_id)
 
 
 # ---------------------------------------------------------------------------

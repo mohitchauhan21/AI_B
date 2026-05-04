@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}SciBot — Experiment Detail{% endblock %}
+
+{% block head %}
+<style>
+  /* Experiment Detail Specific Styles */
+  .detail-hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    position: relative;
+  }
+  .detail-emoji {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .detail-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 1rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+  }
+  .detail-badges {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    padding: 0 1rem;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(14px);
+  }
+  .stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 0.5rem;
+  }
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .content-section {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    padding: 0 1rem;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+  .section-header .icon {
+    font-size: 2rem;
+  }
+
+  /* Materials */
+  .checklist {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    list-style: none;
+  }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--card-border);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .check-item:last-child {
+    border-bottom: none;
+  }
+  .check-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--neon-green);
+    cursor: pointer;
+  }
+  .check-item.checked span {
+    text-decoration: line-through;
+    color: var(--neon-green);
+    opacity: 0.7;
+  }
+
+  /* Steps */
+  .step-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+  }
+  .step-card.active {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+  }
+  .step-card.completed {
+    border-color: var(--neon-green);
+    opacity: 0.8;
+  }
+  .step-num {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.1);
+    border: 2px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  .step-card.active .step-num {
+    background: var(--neon-cyan);
+    color: var(--bg-primary);
+    box-shadow: 0 0 15px var(--neon-cyan);
+  }
+  .step-card.completed .step-num {
+    background: var(--neon-green);
+    border-color: var(--neon-green);
+    color: var(--bg-primary);
+  }
+  .step-text {
+    flex: 1;
+    min-width: 200px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .step-card.completed .step-text {
+    color: var(--text-primary);
+  }
+  .done-btn {
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    background: transparent;
+    transition: var(--transition);
+  }
+  .done-btn:hover {
+    background: rgba(0, 229, 255, 0.1);
+  }
+  .step-card.completed .done-btn {
+    background: var(--neon-green);
+    border-color: var(--neon-green);
+    color: var(--bg-primary);
+    pointer-events: none;
+  }
+
+  /* Science & Safety */
+  .info-box {
+    background: var(--bg-card);
+    border-left: 4px solid var(--neon-purple);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .info-box p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .fun-fact {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px dashed var(--neon-purple);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    font-style: italic;
+    color: var(--text-primary);
+  }
+  .fun-fact strong {
+    color: var(--neon-purple);
+  }
+
+  .safety-box {
+    background: rgba(255, 60, 80, 0.05);
+    border: 1px solid rgba(255, 60, 80, 0.2);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  .safety-box ul {
+    padding-left: 1.5rem;
+    list-style-type: disc;
+    color: var(--text-secondary);
+  }
+  .safety-box li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 2rem 1rem 4rem;
+  }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+    color: #050b18;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .cta-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<script>
+  // Immediately apply theme to prevent flash
+  const theme = localStorage.getItem("scibot-theme");
+  if (theme === "light") {
+    document.body.classList.add("light-mode");
+  }
+</script>
+
+<div id="experimentContainer" style="display: none;">
+  <!-- Hero -->
+  <div class="detail-hero">
+    <div class="detail-emoji" id="expEmoji"></div>
+    <h1 class="detail-title" id="expTitle"></h1>
+    <div class="detail-badges" id="expBadges"></div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="quick-stats">
+    <div class="stat-card">
+      <div class="stat-label">🧪 Materials Needed</div>
+      <div class="stat-value" id="statMaterials"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">⏱ Time Required</div>
+      <div class="stat-value" id="statTime"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">⚠️ Safety Level</div>
+      <div class="stat-value" id="statSafety"></div>
+    </div>
+  </div>
+
+  <!-- Materials -->
+  <div class="content-section">
+    <h2 class="section-header"><span class="icon">🧪</span> Gather Your Materials</h2>
+    <ul class="checklist" id="materialsList"></ul>
+  </div>
+
+  <!-- Steps -->
+  <div class="content-section">
+    <h2 class="section-header"><span class="icon">📋</span> Step-by-Step Instructions</h2>
+    <div id="stepsContainer"></div>
+  </div>
+
+  <!-- Science Explained -->
+  <div class="content-section">
+    <h2 class="section-header"><span class="icon">🔬</span> The Science Explained</h2>
+    <div class="info-box">
+      <p id="scienceText"></p>
+      <div class="fun-fact">
+        <strong>💡 Did You Know?</strong> <span id="funFactText"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety -->
+  <div class="content-section">
+    <h2 class="section-header"><span class="icon">⚠️</span> Safety Precautions</h2>
+    <div class="safety-box">
+      <ul id="safetyList"></ul>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <button class="cta-btn" id="askBotBtn">
+      <span>💬 Ask SciBot about this experiment</span>
+    </button>
+  </div>
+</div>
+
+<div id="errorState" style="display: none; text-align: center; padding: 4rem;">
+  <h2>Experiment Not Found</h2>
+  <p>We couldn't load the details for this experiment. Please go back and try again.</p>
+  <a href="/explorer" class="neon-btn" style="display: inline-flex; margin-top: 1rem;">Back to Explorer</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const rawData = sessionStorage.getItem("scibot-experiment");
+    const container = document.getElementById("experimentContainer");
+    const errorState = document.getElementById("errorState");
+
+    if (!rawData) {
+      errorState.style.display = "block";
+      return;
+    }
+
+    try {
+      const exp = JSON.parse(rawData);
+      container.style.display = "block";
+
+      // 1. Hero
+      document.getElementById("expEmoji").textContent = exp.emoji;
+      document.getElementById("expTitle").textContent = exp.name;
+      
+      const diffClass = `badge-${exp.difficulty.toLowerCase()}`;
+      document.getElementById("expBadges").innerHTML = `
+        <span class="badge badge-category">${exp.category}</span>
+        <span class="badge ${diffClass}">${exp.difficulty}</span>
+        <span class="badge" style="border:1px solid var(--card-border); background:var(--bg-card); color:var(--text-primary)">⏱ ${exp.time}</span>
+      `;
+
+      // 2. Quick Stats
+      document.getElementById("statMaterials").textContent = `${exp.materials.length} Items`;
+      document.getElementById("statTime").textContent = exp.time;
+      
+      let safetyLevel = "Low";
+      let safetyColor = "var(--neon-green)";
+      if (exp.difficulty === "Intermediate") {
+        safetyLevel = "Medium";
+        safetyColor = "var(--neon-orange)";
+      } else if (exp.difficulty === "Advanced") {
+        safetyLevel = "High";
+        safetyColor = "var(--neon-red)";
+      }
+      document.getElementById("statSafety").innerHTML = `<span style="color: ${safetyColor}">${safetyLevel}</span>`;
+
+      // 3. Materials
+      const materialsList = document.getElementById("materialsList");
+      exp.materials.forEach((mat, idx) => {
+        const li = document.createElement("li");
+        li.className = "check-item";
+        li.innerHTML = `
+          <input type="checkbox" id="mat-${idx}">
+          <label for="mat-${idx}" style="cursor: pointer; flex: 1;"><span>${mat}</span></label>
+        `;
+        const checkbox = li.querySelector('input');
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) li.classList.add("checked");
+          else li.classList.remove("checked");
+        });
+        materialsList.appendChild(li);
+      });
+
+      // 4. Steps
+      const stepsContainer = document.getElementById("stepsContainer");
+      const stepsArray = exp.detailedSteps || exp.steps; // Fallback to normal steps if detailed missing
+      
+      stepsArray.forEach((step, idx) => {
+        const card = document.createElement("div");
+        card.className = `step-card ${idx === 0 ? 'active' : ''}`;
+        card.id = `step-card-${idx}`;
+        
+        card.innerHTML = `
+          <div class="step-num">${idx + 1}</div>
+          <div class="step-text">${step}</div>
+          <button class="done-btn" data-idx="${idx}">✓ Done</button>
+        `;
+        stepsContainer.appendChild(card);
+      });
+
+      // Step completion logic
+      document.querySelectorAll(".done-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+          const idx = parseInt(this.getAttribute("data-idx"));
+          const currentCard = document.getElementById(`step-card-${idx}`);
+          
+          currentCard.classList.remove("active");
+          currentCard.classList.add("completed");
+          this.textContent = "Completed";
+
+          const nextCard = document.getElementById(`step-card-${idx + 1}`);
+          if (nextCard) {
+            nextCard.classList.add("active");
+            nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      });
+
+      // 5. Science & Fact
+      document.getElementById("scienceText").textContent = exp.science;
+      document.getElementById("funFactText").textContent = exp.funFact || "Science is awesome!";
+
+      // 6. Safety
+      const safetyList = document.getElementById("safetyList");
+      const safetyTips = exp.safety || ["Always have adult supervision.", "Wash your hands after the experiment."];
+      safetyTips.forEach(tip => {
+        const li = document.createElement("li");
+        li.textContent = tip;
+        safetyList.appendChild(li);
+      });
+
+      // 7. CTA Button
+      const askBtn = document.getElementById("askBotBtn");
+      askBtn.addEventListener("click", () => {
+        sessionStorage.setItem("scibot-prefill", `Tell me more about the ${exp.name} experiment`);
+        // We go to home page (chat) in current tab, since we opened detail page in new tab
+        window.location.href = "/";
+      });
+
+    } catch (e) {
+      console.error(e);
+      errorState.style.display = "block";
+    }
+  });
+</script>
+{% endblock %}

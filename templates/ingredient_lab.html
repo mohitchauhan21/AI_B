@@ -41,11 +41,21 @@
 
 
   <!-- ── Results ── -->
-  <div class="ingredient-results hidden" id="ingredientResults">
-    <h2 class="results-heading">🔎 Suggested Experiments</h2>
-    <div class="results-cards" id="resultsCards">
-      <!-- Filled by JS -->
+  <div id="ingredientResults" class="hidden">
+
+    <div class="results-header">
+      <h3>🔬 Suggested Experiment</h3>
+      <div class="results-header-actions">
+        <span id="expCounter" class="exp-counter-badge"></span>
+        <button id="shuffleBtn" class="shuffle-btn-mini" type="button">
+          <span class="shuffle-icon">🔀</span>
+          <span class="shuffle-label">Next Experiment</span>
+        </button>
+      </div>
     </div>
+
+    <div id="resultsCards"></div>
+
   </div>
 </section>
 {% endblock %}
