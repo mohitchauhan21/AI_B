@@ -2,68 +2,33 @@
 {% block title %}SciBot — AI Chatbot{% endblock %}
 
 {% block content %}
-  <div id="onboardingOverlay" class="onboarding-overlay">
-    <div class="onboarding-card">
-
-      <div class="onboarding-logo">⚗️</div>
-      <h2 class="onboarding-title">Welcome to SciBot</h2>
-      <p class="onboarding-subtitle">
-        Let's personalize your science experience
-      </p>
-
-      <div class="onboarding-step" id="step1">
-        <p class="step-label">What is your grade level?</p>
-        <div class="option-grid">
-          <button class="option-btn" data-value="grade6-8">
-            🎒 Grade 6–8
-          </button>
-          <button class="option-btn" data-value="grade9-10">
-            📚 Grade 9–10
-          </button>
-          <button class="option-btn" data-value="grade11-12">
-            🎓 Grade 11–12
-          </button>
-          <button class="option-btn" data-value="college">
-            🏛️ College
-          </button>
-        </div>
-      </div>
-
-      <div class="onboarding-step hidden" id="step2">
-        <p class="step-label">What subject interests you most?</p>
-        <div class="option-grid">
-          <button class="option-btn" data-value="Chemistry">
-            🧪 Chemistry
-          </button>
-          <button class="option-btn" data-value="Physics">
-            ⚡ Physics
-          </button>
-          <button class="option-btn" data-value="Biology">
-            🌿 Biology
-          </button>
-          <button class="option-btn" data-value="All">
-            🔬 All Subjects
-          </button>
-        </div>
-      </div>
-
-      <div class="onboarding-progress">
-        <div class="progress-dot active" id="dot1"></div>
-        <div class="progress-dot" id="dot2"></div>
-      </div>
-
-    </div>
-  </div>
-
 <section class="chat-section" id="chatSection">
-
+  
   <!-- ── Hero Section ── -->
   <div class="hero-section">
     <h1 class="hero-title">Your AI Science Lab</h1>
     <p class="hero-subtitle">Ask SciBot anything about science experiments</p>
   </div>
 
-
+  <!-- ── Optional Preferences Bar ── -->
+  <div class="preferences-bar" id="preferencesBar">
+    <div class="pref-label">🎯 Optional Preferences:</div>
+    <div class="pref-controls">
+      <select id="gradeSelect" class="pref-select">
+        <option value="">Any Grade</option>
+        <option value="grade6-8">Grade 6–8</option>
+        <option value="grade9-10">Grade 9–10</option>
+        <option value="grade11-12">Grade 11–12</option>
+        <option value="college">College</option>
+      </select>
+      <select id="subjectSelect" class="pref-select">
+        <option value="">Any Subject</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology">Biology</option>
+      </select>
+    </div>
+  </div>
 
   <!-- ── Chat Window ── -->
   <div class="chat-window" id="chatWindow">
