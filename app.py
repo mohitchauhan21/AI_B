@@ -132,9 +132,26 @@ def chat():
     history = data.get("history", [])
     temperature = float(data.get("temperature", 0.7))
     top_p = float(data.get("top_p", 0.9))
+    grade = data.get("grade", "")
+    subject = data.get("subject", "")
 
     # Build messages list
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    personalization = ""
+    if grade:
+        personalization += f"The student is in {grade}. "
+    if subject:
+        personalization += (
+            f"Their primary interest is {subject}. "
+            f"Prioritize {subject} experiments unless asked otherwise. "
+        )
+    personalization += (
+        "Always match experiment complexity to their grade level."
+    )
+    dynamic_prompt = SYSTEM_PROMPT + (
+        f"\n\nUSER PROFILE: {personalization}"
+        if personalization else ""
+    )
+    messages = [{"role": "system", "content": dynamic_prompt}]
     for msg in history:
         messages.append({"role": msg["role"], "content": msg["content"]})
     messages.append({"role": "user", "content": user_message})

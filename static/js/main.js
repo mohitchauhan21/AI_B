@@ -73,6 +73,95 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ── Onboarding ──
+  const overlay = document.getElementById("onboardingOverlay");
+  let userProfile = JSON.parse(
+    localStorage.getItem("scibot-profile") || "null"
+  );
+
+  if (overlay) {
+    // If profile already exists skip onboarding
+    if (userProfile) {
+      overlay.style.display = "none";
+      applyProfileToChat(userProfile);
+    } else {
+      // Show onboarding
+      let selectedGrade = null;
+      let currentStep = 1;
+
+      document.querySelectorAll(".option-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const step = btn.closest(".onboarding-step");
+          step.querySelectorAll(".option-btn")
+            .forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+
+          setTimeout(() => {
+            if (currentStep === 1) {
+              selectedGrade = btn.dataset.value;
+              // Move to step 2
+              document.getElementById("step1")
+                .classList.add("hidden");
+              document.getElementById("step2")
+                .classList.remove("hidden");
+              document.getElementById("dot1")
+                .classList.remove("active");
+              document.getElementById("dot2")
+                .classList.add("active");
+              currentStep = 2;
+            } else {
+              // Complete onboarding
+              const profile = {
+                grade: selectedGrade,
+                subject: btn.dataset.value
+              };
+              localStorage.setItem(
+                "scibot-profile", JSON.stringify(profile)
+              );
+              userProfile = profile;
+
+              // Animate overlay out
+              overlay.style.opacity = "0";
+              overlay.style.transform = "scale(1.05)";
+              setTimeout(() => {
+                overlay.style.display = "none";
+                applyProfileToChat(profile);
+              }, 400);
+            }
+          }, 300);
+        });
+      });
+    }
+  }
+
+  function applyProfileToChat(profile) {
+    // Show a personalized greeting in the first bot message
+    const gradeLabels = {
+      "grade6-8": "Grade 6–8",
+      "grade9-10": "Grade 9–10",
+      "grade11-12": "Grade 11–12",
+      "college": "College"
+    };
+    const gradeText = gradeLabels[profile.grade] || profile.grade;
+    const subjectText = profile.subject;
+
+    // Update the welcome bubble if it exists
+    const firstBubble = document.querySelector(
+      ".msg.bot .msg-bubble"
+    );
+    if (firstBubble) {
+      firstBubble.innerHTML = `
+        <p>Hey there, future scientist! 🧪 I'm <strong>SciBot</strong>.</p>
+        <p>I can see you're a <strong>${gradeText}</strong> student
+        interested in <strong>${subjectText}</strong>. 
+        I'll tailor my experiments just for you!</p>
+        <p>What would you like to explore today?</p>`;
+    }
+
+    // Also store profile globally for use in fetch calls
+    window.scibotProfile = profile;
+  }
+
   // ════════════════════════════════════════════════════════════
   //  CHATBOT PAGE
   // ════════════════════════════════════════════════════════════
@@ -125,7 +214,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, history, temperature, top_p }),
+          body: JSON.stringify({
+            message: text,
+            history,
+            temperature,
+            top_p,
+            grade: window.scibotProfile?.grade || "",
+            subject: window.scibotProfile?.subject || ""
+          }),
         });
 
         // Remove typing indicator

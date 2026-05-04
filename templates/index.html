@@ -2,6 +2,59 @@
 {% block title %}SciBot — AI Chatbot{% endblock %}
 
 {% block content %}
+  <div id="onboardingOverlay" class="onboarding-overlay">
+    <div class="onboarding-card">
+
+      <div class="onboarding-logo">⚗️</div>
+      <h2 class="onboarding-title">Welcome to SciBot</h2>
+      <p class="onboarding-subtitle">
+        Let's personalize your science experience
+      </p>
+
+      <div class="onboarding-step" id="step1">
+        <p class="step-label">What is your grade level?</p>
+        <div class="option-grid">
+          <button class="option-btn" data-value="grade6-8">
+            🎒 Grade 6–8
+          </button>
+          <button class="option-btn" data-value="grade9-10">
+            📚 Grade 9–10
+          </button>
+          <button class="option-btn" data-value="grade11-12">
+            🎓 Grade 11–12
+          </button>
+          <button class="option-btn" data-value="college">
+            🏛️ College
+          </button>
+        </div>
+      </div>
+
+      <div class="onboarding-step hidden" id="step2">
+        <p class="step-label">What subject interests you most?</p>
+        <div class="option-grid">
+          <button class="option-btn" data-value="Chemistry">
+            🧪 Chemistry
+          </button>
+          <button class="option-btn" data-value="Physics">
+            ⚡ Physics
+          </button>
+          <button class="option-btn" data-value="Biology">
+            🌿 Biology
+          </button>
+          <button class="option-btn" data-value="All">
+            🔬 All Subjects
+          </button>
+        </div>
+      </div>
+
+      <div class="onboarding-progress">
+        <div class="progress-dot active" id="dot1"></div>
+        <div class="progress-dot" id="dot2"></div>
+      </div>
+
+    </div>
+  </div>
+
 <section class="chat-section" id="chatSection">
 
   <!-- ── Hero Section ── -->

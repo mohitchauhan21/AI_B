@@ -1,58 +1,58 @@
 # SciBot — AI Science Experiment Recommender ⚗️
 
-SciBot is a full-stack AI-powered web application designed to recommend, explain, and guide users through educational science experiments. Built with a stunning dark/light futuristic laboratory aesthetic, it features a highly conversational streaming chatbot, a curated experiment explorer, and an interactive ingredient lab.
+SciBot is a full-stack AI-powered web application designed to recommend, explain, and guide users through educational science experiments. Built with a stunning dark/light futuristic laboratory aesthetic, it features a personalized streaming chatbot, a curated experiment explorer, and an interactive ingredient lab.
 
 ## 🚀 Features
 
-### 1. Conversational Chatbot (`/`)
-- **Smart Conversational AI:** System logic dictates that the bot behaves like a friendly science teacher. It naturally handles casual greetings, asks clarifying questions before suggesting experiments, and avoids unsolicited long text dumps.
+### 1. Personalized Chatbot & Onboarding (`/`)
+- **New! Personalized Onboarding:** On first visit, users complete a 2-step setup to select their **Grade Level** (6-8, 9-10, 11-12, or College) and **Subject Interest** (Chemistry, Physics, Biology, or All).
+- **Profile-Aware AI:** The system logic behavior is tailored to the user's grade level and interests. SciBot greets users by their preferences and adjusts experiment complexity accordingly.
 - **Real-Time Streaming:** Streams responses seamlessly from the **Groq API** using the `llama-3.3-70b-versatile` model.
-- **Dynamic UI:** Features a chat window that auto-expands after the landing hero section hides, distinct user/bot message bubbles, a glowing input bar, a pulsing send button, and an animated "SciBot is thinking..." state.
+- **Dynamic UI:** Features a chat window that auto-expands, distinct user/bot bubbles, glowing inputs, and a sticky navigation bar for easy access.
 
-### 2. Experiment Explorer (`/explorer`)
-- A visually appealing grid of 12 curated science experiments.
-- **Interactive Cards:** Hover over cards to see a smooth shimmer effect, lift animation, and emoji scaling. Each card features a glowing colored top border indicating its category (Chemistry, Physics, Biology, Earth Science).
-- **Filters:** Instantly sort by Category and Difficulty (Beginner, Intermediate, Advanced).
-- **Frosted Glass Modal:** Clicking a card opens an animated frosted glass modal revealing materials (prefixed with ✅), numbered step-by-step instructions (with glowing circles), and a highlighted science explanation box.
+### 2. Experiment Explorer & Detail Pages (`/explorer`)
+- **Curated Grid:** A visually appealing grid of curated science experiments with category-coded glowing borders.
+- **Interactive Cards:** Hover animations, emoji scaling, and category/difficulty badges.
+- **New! Dedicated Detail Page:** Clicking an explorer card now opens a rich, interactive detail page (`/experiment/<id>`) in a new tab.
+- **Detail Features:** Includes a materials checklist, step-by-step guided instructions, safety protocols, and a scientific explanation section. Features a "Ask SciBot about this" button that pre-fills the chatbot with relevant questions.
 
 ### 3. Ingredient Lab (`/ingredient-lab`)
-- **Animated Beaker:** Features a playful, pure-CSS animated bubbling beaker illustration.
-- **Smart Input:** A dynamic input field with a cycling placeholder that suggests common household materials every 3 seconds.
-- Allows users to input comma-separated materials they have at home.
-- Submits the materials to the Groq API, generating exactly 3 custom science experiments based on the input.
-- Displays the generated suggestions instantly with staggered fade-in animations and numbered neon headers.
+- **Animated Beaker:** Playful, pure-CSS animated bubbling beaker illustration.
+- **New! Multi-Experiment Carousel:** Generates exactly **4 creative experiments** based on materials you have at home.
+- **Shuffle UI:** Features a bottom shuffle bar with a "Next Experiment" button and interactive indicator dots to cycle through generated suggestions.
+- **Sticky Header:** The results header (with the shuffle button and progress counter) stays at the top while you scroll through long instructions.
 
 ## 🎨 UI/UX Highlights
-- **Light/Dark Theme Toggle:** Click the 🌙 / ☀️ icon in the navbar to switch themes. Preferences are saved automatically via `localStorage`.
-- **Aesthetic:** Features deep navy/black backgrounds, neon green and cyan accents, and glassmorphism styling.
-- **Animations:** Custom animated background particles, smooth page load fade-ins, and interactive ripple click effects on buttons.
-- **Typography:** Orbitron for technical headings, Exo 2 for readable body text.
-- **Responsiveness:** Fully responsive design that works seamlessly on desktop and mobile devices, including a smooth slide-down mobile menu.
+- **Light/Dark Theme Toggle:** Persistent theme switching via the 🌙 / ☀️ navbar icon (preferences saved in `localStorage`).
+- **Sticky Navigation:** Both the global navbar and the Lab results header remain visible during scroll for superior navigation.
+- **Glassmorphism Aesthetic:** Deep navy backgrounds, neon accents, and frosted glass effects across all modals and headers.
+- **Personalized Greeting:** Bot greets you based on your selected academic level and interests on your first visit.
 
 ## 🛠️ Tech Stack
 
 - **Backend:** Python, Flask
-- **Frontend:** HTML5, Vanilla JavaScript, Custom CSS 
+- **Frontend:** HTML5, Vanilla JavaScript, Custom CSS (Vanilla)
 - **AI Integration:** Groq Python SDK (Model: `llama-3.3-70b-versatile`)
-- **Environment:** `python-dotenv` for managing API keys.
+- **State Management:** `localStorage` for themes/profiles, `sessionStorage` for cross-page data transfer.
 
 ## 📂 Project Structure
 
 ```text
 science-recommender/
-├── app.py                 # Main Flask application and API endpoints
+├── app.py                 # Main Flask application, API endpoints, and System Prompts
 ├── .env                   # Environment variables (API Key)
 ├── requirements.txt       # Python dependencies
 ├── static/
 │   ├── css/
-│   │   └── style.css      # Custom theming, animations, and layout
+│   │   └── style.css      # Design system, sticky layouts, and animations
 │   └── js/
-│       └── main.js        # Frontend logic (streaming, theme toggle, dynamic UI)
+│       └── main.js        # Onboarding, streaming, carousel logic, and theme sync
 └── templates/
-    ├── base.html          # Base layout with navbar and theme toggle
-    ├── index.html         # Chatbot UI
+    ├── base.html          # Global layout with sticky navbar
+    ├── index.html         # Chatbot & Onboarding UI
     ├── explorer.html      # Experiment grid UI
-    └── ingredient_lab.html# Material input UI
+    ├── experiment_detail.html # New! Dedicated experiment instruction page
+    └── ingredient_lab.html# Material-based experiment generator UI
 ```
 
 ## ⚙️ Setup and Installation
@@ -84,3 +84,4 @@ science-recommender/
 
 6. **Access the App:**
    - Open your web browser and navigate to `http://127.0.0.1:5000`
+
