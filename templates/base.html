@@ -20,7 +20,16 @@
 </head>
 <body>
   <!-- ───────── Animated Background Particles ───────── -->
-  <div class="bg-particles" id="bgParticles"></div>
+  <div class="bg-particles" id="bgParticles">
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 5s;"></div>
+  </div>
 
   <!-- ───────── Navigation ───────── -->
   <nav class="navbar" id="mainNav">
@@ -29,9 +38,12 @@
       <span class="logo-text">Sci<span class="accent">Bot</span></span>
     </a>
 
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme">🌙</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
 
     <ul class="nav-links" id="navLinks">
       <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}" id="linkHome">💬 Chatbot</a></li>
@@ -45,10 +57,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- ───────── Footer ───────── -->
-  <footer class="site-footer" id="siteFooter">
-    <p>Built with 🧬 by <span class="accent">SciBot</span> &mdash; Powered by Groq &amp; Llama&nbsp;3.3</p>
-  </footer>
+
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block scripts %}{% endblock %}

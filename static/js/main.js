@@ -3,6 +3,41 @@
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ─── Theme Toggle ───
+  const themeToggle = document.getElementById("themeToggle");
+  const currentTheme = localStorage.getItem("scibot-theme");
+  if (currentTheme === "light") {
+    document.body.classList.add("light-mode");
+    if(themeToggle) themeToggle.textContent = "☀️";
+  }
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
+      let theme = "dark";
+      if (document.body.classList.contains("light-mode")) {
+        theme = "light";
+        themeToggle.textContent = "☀️";
+      } else {
+        themeToggle.textContent = "🌙";
+      }
+      localStorage.setItem("scibot-theme", theme);
+    });
+  }
+
+  // ─── Button Ripple Effect ───
+  document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      const x = e.clientX - e.target.getBoundingClientRect().left;
+      const y = e.clientY - e.target.getBoundingClientRect().top;
+      const ripples = document.createElement("span");
+      ripples.style.left = x + "px";
+      ripples.style.top = y + "px";
+      ripples.classList.add("ripple");
+      this.appendChild(ripples);
+      setTimeout(() => ripples.remove(), 600);
+    });
+  });
+
   // ─── Navbar Toggle (mobile) ───
   const toggle = document.getElementById("navToggle");
   const links  = document.getElementById("navLinks");
@@ -39,10 +74,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (chatForm) {
     let history = [];
 
-    // Auto-resize textarea
+    // Auto-resize textarea and send button glow
     chatInput.addEventListener("input", () => {
       chatInput.style.height = "auto";
       chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+      if(chatInput.value.trim().length > 0) {
+        sendBtn.classList.add("has-text");
+      } else {
+        sendBtn.classList.remove("has-text");
+      }
     });
 
     // Enter to send (Shift+Enter for newline)
@@ -93,11 +133,21 @@ document.addEventListener("DOMContentLoaded", () => {
           const chunk = decoder.decode(value, { stream: true });
           const lines = chunk.split("\n");
           for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
-            const payload = line.slice(6);
-            if (payload === "[DONE]") continue;
-            if (payload.startsWith("[ERROR]")) { fullReply += payload; break; }
-            fullReply += payload;
+              if (!line.startsWith("data: ")) continue;
+              const raw = line.slice(6).trim();
+              if (!raw) continue;
+              try {
+                  const parsed = JSON.parse(raw);
+                  if (parsed === "[DONE]") continue;
+                  if (parsed.startsWith("[ERROR]")) {
+                      fullReply += parsed;
+                      break;
+                  }
+                  fullReply += parsed;
+              } catch (err) {
+                  // fallback for any unparseable chunk
+                  fullReply += raw;
+              }
           }
           bubble.innerHTML = renderMarkdown(fullReply);
           scrollChat();
@@ -132,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function createTypingIndicator() {
     const div = document.createElement("div");
     div.className = "msg bot";
-    div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble typing-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+    div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble typing-indicator">SciBot is thinking... <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
     return div;
   }
 
@@ -140,40 +190,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ── Minimal Markdown renderer ──
   function renderMarkdown(md) {
+    // Step 1: Escape HTML
     let html = md
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/`(.+?)`/g, "<code>$1</code>")
-      .replace(/^### (.+)$/gm, '<h4 style="color:var(--neon-cyan);margin:0.6em 0 0.3em;">$1</h4>')
-      .replace(/^## (.+)$/gm, '<h3 style="color:var(--neon-green);margin:0.6em 0 0.3em;">$1</h3>')
-      .replace(/^# (.+)$/gm, '<h2 style="color:var(--neon-green);margin:0.6em 0 0.3em;">$1</h2>');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
-    // Convert lines to paragraphs / lists
+    // Step 2: Fix broken markdown links like [text](url) showing as plain text
+    html = html.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
+
+    // Step 3: Bold and italic
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+    html = html.replace(/`(.+?)`/g, "<code>$1</code>");
+
+    // Step 4: Headings
+    html = html.replace(/^### (.+)$/gm, "<h4>$1</h4>");
+    html = html.replace(/^## (.+)$/gm, "<h3>$1</h3>");
+    html = html.replace(/^# (.+)$/gm, "<h2>$1</h2>");
+
+    // Step 5: Process line by line
     const lines = html.split("\n");
-    let out = "", inUl = false, inOl = false;
-    for (let l of lines) {
-      const trimmed = l.trim();
-      // unordered
-      if (/^[-*] /.test(trimmed)) {
+    let out = "";
+    let inUl = false;
+    let inOl = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      // Unordered list item (- or *)
+      if (/^[-*]\s+/.test(line)) {
+        if (inOl) { out += "</ol>"; inOl = false; }
         if (!inUl) { out += "<ul>"; inUl = true; }
-        out += `<li>${trimmed.slice(2)}</li>`;
+        out += `<li>${line.replace(/^[-*]\s+/, "")}</li>`;
         continue;
-      } else if (inUl) { out += "</ul>"; inUl = false; }
-      // ordered
-      if (/^\d+\.\s/.test(trimmed)) {
+      }
+
+      // Ordered list item (1. 2. 3.)
+      if (/^\d+\.\s+/.test(line)) {
+        if (inUl) { out += "</ul>"; inUl = false; }
         if (!inOl) { out += "<ol>"; inOl = true; }
-        out += `<li>${trimmed.replace(/^\d+\.\s/, "")}</li>`;
+        out += `<li>${line.replace(/^\d+\.\s+/, "")}</li>`;
         continue;
-      } else if (inOl) { out += "</ol>"; inOl = false; }
-      // blank line
-      if (trimmed === "") { out += " "; continue; }
-      // headings already converted
-      if (trimmed.startsWith("<h")) { out += trimmed; continue; }
-      out += `<p>${trimmed}</p>`;
+      }
+
+      // Close open lists
+      if (inUl) { out += "</ul>"; inUl = false; }
+      if (inOl) { out += "</ol>"; inOl = false; }
+
+      // Empty line
+      if (line === "") { out += "<br>"; continue; }
+
+      // Already a heading tag
+      if (/^<h[2-4]>/.test(line)) { out += line; continue; }
+
+      // Regular paragraph
+      out += `<p>${line}</p>`;
     }
+
+    // Close any unclosed lists
     if (inUl) out += "</ul>";
     if (inOl) out += "</ol>";
+
     return out;
   }
 
@@ -247,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
       filtered.forEach((exp, i) => {
         const card = document.createElement("div");
         card.className = "exp-card";
+        card.setAttribute("data-cat", exp.category);
         card.style.animationDelay = `${i * 0.06}s`;
         const diffClass = `badge-${exp.difficulty.toLowerCase()}`;
         card.innerHTML = `
@@ -310,6 +389,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // ════════════════════════════════════════════════════════════
   //  INGREDIENT LAB
   // ════════════════════════════════════════════════════════════
+  const ingInput = document.getElementById("ingredientInput");
+  if(ingInput) {
+    const placeholders = [
+      "e.g. baking soda, vinegar, food coloring",
+      "e.g. balloon, string, water, salt",
+      "e.g. milk, dish soap, cotton swab",
+      "e.g. lemon, copper wire, nail"
+    ];
+    let pIdx = 0;
+    setInterval(() => {
+      pIdx = (pIdx + 1) % placeholders.length;
+      ingInput.setAttribute("placeholder", placeholders[pIdx]);
+    }, 3000);
+  }
+
   const ingForm = document.getElementById("ingredientForm");
   if (ingForm) {
     ingForm.addEventListener("submit", async (e) => {
@@ -340,7 +434,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
         if (data.error) throw new Error(data.error);
 
-        cards.innerHTML = `<div class="result-card">${renderMarkdownSimple(data.response)}</div>`;
+        // Split response by Markdown headers to make individual cards
+        let rawHtml = renderMarkdownSimple(data.response);
+        // A simple split by h3 or h2 if groq formats it like that
+        const splitRegex = /(?=<h[2-3])/g;
+        const experiments = rawHtml.split(splitRegex).filter(e => e.trim().length > 0);
+        
+        if (experiments.length > 0) {
+          cards.innerHTML = experiments.map((expHtml, idx) => {
+            return `<div class="result-card">
+              <div class="exp-header-num">Experiment ${idx + 1}</div>
+              ${expHtml}
+            </div>`;
+          }).join("");
+        } else {
+          cards.innerHTML = `<div class="result-card">${rawHtml}</div>`;
+        }
+
         results.classList.remove("hidden");
       } catch (err) {
         cards.innerHTML = `<div class="result-card"><p>⚠️ ${err.message}</p></div>`;

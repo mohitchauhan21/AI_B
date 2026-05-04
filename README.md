@@ -1,32 +1,38 @@
 # SciBot — AI Science Experiment Recommender ⚗️
 
-SciBot is a full-stack AI-powered web application designed to recommend, explain, and guide users through educational science experiments. Built with a dark, futuristic laboratory aesthetic, it features a streaming chatbot, a curated experiment explorer, and an interactive ingredient lab.
+SciBot is a full-stack AI-powered web application designed to recommend, explain, and guide users through educational science experiments. Built with a stunning dark/light futuristic laboratory aesthetic, it features a highly conversational streaming chatbot, a curated experiment explorer, and an interactive ingredient lab.
 
 ## 🚀 Features
 
-### 1. Main Chatbot (`/`)
-- Interactive chat interface where users can ask for science experiment recommendations.
-- Streams responses in real-time from the **Groq API** using the `llama-3.3-70b-versatile` model.
-- Maintains session-based conversation history.
-- Enforces domain-specific constraints via system prompts (only discusses science/educational topics).
-- Includes a collapsible Model Config panel to adjust **Temperature** and **Top-p** settings on the fly.
+### 1. Conversational Chatbot (`/`)
+- **Smart Conversational AI:** System logic dictates that the bot behaves like a friendly science teacher. It naturally handles casual greetings, asks clarifying questions before suggesting experiments, and avoids unsolicited long text dumps.
+- **Real-Time Streaming:** Streams responses seamlessly from the **Groq API** using the `llama-3.3-70b-versatile` model.
+- **Dynamic UI:** Features a chat window that auto-expands after the landing hero section hides, distinct user/bot message bubbles, a glowing input bar, a pulsing send button, and an animated "SciBot is thinking..." state.
 
 ### 2. Experiment Explorer (`/explorer`)
 - A visually appealing grid of 12 curated science experiments.
-- **Filters** by Category (Physics, Chemistry, Biology, Earth Science) and Difficulty (Beginner, Intermediate, Advanced).
-- Displays key details at a glance: category, difficulty badge, and estimated time.
-- Clicking a card opens a modal revealing required materials, step-by-step instructions, and the scientific concepts explained.
+- **Interactive Cards:** Hover over cards to see a smooth shimmer effect, lift animation, and emoji scaling. Each card features a glowing colored top border indicating its category (Chemistry, Physics, Biology, Earth Science).
+- **Filters:** Instantly sort by Category and Difficulty (Beginner, Intermediate, Advanced).
+- **Frosted Glass Modal:** Clicking a card opens an animated frosted glass modal revealing materials (prefixed with ✅), numbered step-by-step instructions (with glowing circles), and a highlighted science explanation box.
 
 ### 3. Ingredient Lab (`/ingredient-lab`)
+- **Animated Beaker:** Features a playful, pure-CSS animated bubbling beaker illustration.
+- **Smart Input:** A dynamic input field with a cycling placeholder that suggests common household materials every 3 seconds.
 - Allows users to input comma-separated materials they have at home.
-- Submits the materials to the Groq API, which generates exactly 3 custom science experiments based on the input.
-- Displays the generated suggestions as beautifully formatted, easy-to-read cards.
-- Includes a Model Config panel to tweak the AI's creativity.
+- Submits the materials to the Groq API, generating exactly 3 custom science experiments based on the input.
+- Displays the generated suggestions instantly with staggered fade-in animations and numbered neon headers.
+
+## 🎨 UI/UX Highlights
+- **Light/Dark Theme Toggle:** Click the 🌙 / ☀️ icon in the navbar to switch themes. Preferences are saved automatically via `localStorage`.
+- **Aesthetic:** Features deep navy/black backgrounds, neon green and cyan accents, and glassmorphism styling.
+- **Animations:** Custom animated background particles, smooth page load fade-ins, and interactive ripple click effects on buttons.
+- **Typography:** Orbitron for technical headings, Exo 2 for readable body text.
+- **Responsiveness:** Fully responsive design that works seamlessly on desktop and mobile devices, including a smooth slide-down mobile menu.
 
 ## 🛠️ Tech Stack
 
 - **Backend:** Python, Flask
-- **Frontend:** HTML5, Vanilla JavaScript, Custom CSS (Glassmorphism, Animations)
+- **Frontend:** HTML5, Vanilla JavaScript, Custom CSS 
 - **AI Integration:** Groq Python SDK (Model: `llama-3.3-70b-versatile`)
 - **Environment:** `python-dotenv` for managing API keys.
 
@@ -39,22 +45,15 @@ science-recommender/
 ├── requirements.txt       # Python dependencies
 ├── static/
 │   ├── css/
-│   │   └── style.css      # Custom dark futuristic theme
+│   │   └── style.css      # Custom theming, animations, and layout
 │   └── js/
-│       └── main.js        # Frontend logic (streaming, filters, modals)
+│       └── main.js        # Frontend logic (streaming, theme toggle, dynamic UI)
 └── templates/
-    ├── base.html          # Base layout with navbar and animations
+    ├── base.html          # Base layout with navbar and theme toggle
     ├── index.html         # Chatbot UI
     ├── explorer.html      # Experiment grid UI
     └── ingredient_lab.html# Material input UI
 ```
-
-## 🎨 UI/UX Highlights
-- **Theme:** Dark, futuristic laboratory aesthetic.
-- **Color Palette:** Deep navy/black background, neon green, and cyan accents.
-- **Effects:** Glassmorphism styling for cards and modals, smooth hover micro-animations, and a subtle animated particle background.
-- **Typography:** Orbitron for technical headings, Exo 2 for readable body text.
-- **Responsiveness:** Fully responsive design that works seamlessly on desktop and mobile devices.
 
 ## ⚙️ Setup and Installation
 
