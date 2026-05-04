@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}SciBot — Ingredient Lab{% endblock %}
+
+{% block content %}
+<section class="ingredient-section" id="ingredientSection">
+  <h1 class="section-heading" id="ingredientHeading">🧪 Ingredient Lab</h1>
+  <p class="section-sub">Tell us what you have at home and we'll suggest experiments you can do right now!</p>
+
+  <!-- ── Input Form ── -->
+  <form class="ingredient-form" id="ingredientForm" autocomplete="off">
+    <div class="ingredient-input-wrap">
+      <input
+        type="text"
+        id="ingredientInput"
+        placeholder="e.g. vinegar, baking soda, food coloring, balloon, bottle"
+        required
+      />
+      <button type="submit" class="neon-btn" id="ingredientSubmit">
+        <span class="btn-text">Find Experiments</span>
+        <span class="btn-loader hidden" id="ingredientLoader">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </button>
+    </div>
+    <p class="input-hint">Separate materials with commas</p>
+  </form>
+
+  <!-- ── Config (temperature / top-p) ── -->
+  <div class="config-panel mini" id="ingredientConfigPanel">
+    <button class="config-toggle" id="ingredientConfigToggle" aria-label="Toggle settings">
+      ⚙️ <span>Model Settings</span>
+      <svg class="chevron" viewBox="0 0 24 24" width="18" height="18"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+    <div class="config-body" id="ingredientConfigBody">
+      <div class="config-row">
+        <label for="ingTempSlider">Temperature <span class="tooltip" data-tip="Controls randomness.">ℹ️</span></label>
+        <input type="range" id="ingTempSlider" min="0" max="1" step="0.05" value="0.7" />
+        <output id="ingTempValue">0.70</output>
+      </div>
+      <div class="config-row">
+        <label for="ingTopPSlider">Top-p <span class="tooltip" data-tip="Nucleus sampling diversity.">ℹ️</span></label>
+        <input type="range" id="ingTopPSlider" min="0" max="1" step="0.05" value="0.9" />
+        <output id="ingTopPValue">0.90</output>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Results ── -->
+  <div class="ingredient-results hidden" id="ingredientResults">
+    <h2 class="results-heading">🔎 Suggested Experiments</h2>
+    <div class="results-cards" id="resultsCards">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</section>
+{% endblock %}

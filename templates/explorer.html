@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}SciBot — Experiment Explorer{% endblock %}
+
+{% block content %}
+<section class="explorer-section" id="explorerSection">
+  <h1 class="section-heading" id="explorerHeading">🔬 Experiment Explorer</h1>
+  <p class="section-sub">Browse curated science experiments by category and difficulty.</p>
+
+  <!-- ── Filters ── -->
+  <div class="filter-bar" id="filterBar">
+    <div class="filter-group" id="categoryFilters">
+      <span class="filter-label">Category</span>
+      <button class="filter-btn active" data-category="all" id="filterAll">All</button>
+      <button class="filter-btn" data-category="Physics" id="filterPhysics">⚡ Physics</button>
+      <button class="filter-btn" data-category="Chemistry" id="filterChemistry">🧪 Chemistry</button>
+      <button class="filter-btn" data-category="Biology" id="filterBiology">🧬 Biology</button>
+      <button class="filter-btn" data-category="Earth Science" id="filterEarth">🌍 Earth Science</button>
+    </div>
+    <div class="filter-group" id="difficultyFilters">
+      <span class="filter-label">Difficulty</span>
+      <button class="filter-btn active" data-difficulty="all" id="filterDiffAll">All</button>
+      <button class="filter-btn" data-difficulty="Beginner" id="filterBeginner">🟢 Beginner</button>
+      <button class="filter-btn" data-difficulty="Intermediate" id="filterIntermediate">🟡 Intermediate</button>
+      <button class="filter-btn" data-difficulty="Advanced" id="filterAdvanced">🔴 Advanced</button>
+    </div>
+  </div>
+
+  <!-- ── Experiment Grid ── -->
+  <div class="experiment-grid" id="experimentGrid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <!-- ── Empty State ── -->
+  <div class="empty-state hidden" id="emptyState">
+    <p>No experiments match your filters. Try a different combination!</p>
+  </div>
+</section>
+
+<!-- ── Experiment Detail Modal ── -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-card" id="modalCard">
+    <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+    <div class="modal-header" id="modalHeader">
+      <span class="modal-category" id="modalCategory"></span>
+      <span class="modal-difficulty" id="modalDifficulty"></span>
+    </div>
+    <h2 class="modal-title" id="modalTitle"></h2>
+    <p class="modal-time" id="modalTime"></p>
+    <div class="modal-body" id="modalBody">
+      <div class="modal-section">
+        <h3>🧰 Materials</h3>
+        <ul id="modalMaterials"></ul>
+      </div>
+      <div class="modal-section">
+        <h3>📋 Steps</h3>
+        <ol id="modalSteps"></ol>
+      </div>
+      <div class="modal-section">
+        <h3>🧠 Science Explained</h3>
+        <p id="modalScience"></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
