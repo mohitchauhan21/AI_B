@@ -86,6 +86,47 @@ document.addEventListener("DOMContentLoaded", () => {
   if (chatForm) {
     let history = [];
 
+    // ── Context state helpers (sessionStorage — resets on page refresh) ──
+    const ALLOWED_GRADES   = new Set(["grade6-8", "grade9-10", "grade11-12", "college"]);
+    const ALLOWED_SUBJECTS = new Set(["Physics", "Chemistry", "Biology", "Earth Science"]);
+
+    function getContext() {
+      const grade   = sessionStorage.getItem("scibot-grade")   || "";
+      const subject = sessionStorage.getItem("scibot-subject") || "";
+      return {
+        grade:   ALLOWED_GRADES.has(grade)     ? grade   : "",
+        subject: ALLOWED_SUBJECTS.has(subject) ? subject : "",
+      };
+    }
+
+    function hasContext() {
+      const { grade, subject } = getContext();
+      return grade !== "" || subject !== "";
+    }
+
+    // Smart follow-up nudge — shown once per session after 3rd no-context message
+    let userMsgCount = 0;
+    let nudgeShown   = Boolean(sessionStorage.getItem("scibot-nudge-shown"));
+
+    function maybeShowNudge() {
+      if (nudgeShown || hasContext()) return;
+      userMsgCount++;
+      if (userMsgCount >= 3) {
+        nudgeShown = true;
+        sessionStorage.setItem("scibot-nudge-shown", "1");
+        const nudge = document.createElement("div");
+        nudge.className = "msg bot";
+        nudge.innerHTML = `
+          <div class="msg-avatar">🤖</div>
+          <div class="msg-bubble pref-nudge">
+            💡 Want more tailored answers?
+            <strong>Select your grade &amp; subject</strong> above — it's completely optional!
+          </div>`;
+        chatWindow.appendChild(nudge);
+        scrollChat();
+      }
+    }
+
     // Auto-resize textarea and send button glow
     chatInput.addEventListener("input", () => {
       chatInput.style.height = "auto";
@@ -123,6 +164,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const temperature = parseFloat(document.getElementById("tempSlider")?.value ?? 0.7);
       const top_p       = parseFloat(document.getElementById("topPSlider")?.value ?? 0.9);
 
+      // Read context from sessionStorage (safe, allowlist-validated on server too)
+      const { grade, subject } = getContext();
+
       try {
         const res = await fetch("/chat", {
           method: "POST",
@@ -132,8 +176,8 @@ document.addEventListener("DOMContentLoaded", () => {
             history,
             temperature,
             top_p,
-            grade: gradeSelect?.value || "",
-            subject: subjectSelect?.value || ""
+            grade,    // empty string when not set
+            subject,  // empty string when not set
           }),
         });
 
@@ -173,6 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         history.push({ role: "assistant", content: fullReply });
+
+        // Maybe nudge user to set preferences (only if not set, only once)
+        maybeShowNudge();
+
       } catch (err) {
         typing.remove();
         appendMessage("bot", "⚠️ Network error. Please try again.");

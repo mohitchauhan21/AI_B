@@ -135,22 +135,37 @@ def chat():
     grade = data.get("grade", "")
     subject = data.get("subject", "")
 
-    # Build messages list
-    personalization = ""
+    # Build messages list — only inject context when user chose preferences
+    profile_parts = []
     if grade:
-        personalization += f"The student is in {grade}. "
-    if subject:
-        personalization += (
-            f"Their primary interest is {subject}. "
-            f"Prioritize {subject} experiments unless asked otherwise. "
+        grade_labels = {
+            "grade6-8":  "Grade 6–8 (middle school)",
+            "grade9-10": "Grade 9–10 (early high school)",
+            "grade11-12":"Grade 11–12 (senior high school)",
+            "college":   "college level",
+        }
+        label = grade_labels.get(grade, grade)
+        profile_parts.append(
+            f"The student is at {label}. "
+            f"Match explanation depth and complexity to this level: "
+            f"lower grades → simpler language and analogies; "
+            f"higher grades → include theory, equations, and deeper concepts."
         )
-    personalization += (
-        "Always match experiment complexity to their grade level."
-    )
-    dynamic_prompt = SYSTEM_PROMPT + (
-        f"\n\nUSER PROFILE: {personalization}"
-        if personalization else ""
-    )
+    if subject:
+        # Only accept known safe values
+        allowed_subjects = {"Physics", "Chemistry", "Biology", "Earth Science"}
+        if subject in allowed_subjects:
+            profile_parts.append(
+                f"Their primary interest is {subject}. "
+                f"Prioritize {subject} experiments unless asked otherwise."
+            )
+
+    if profile_parts:
+        dynamic_prompt = SYSTEM_PROMPT + "\n\nUSER CONTEXT (selected by user — use to personalise responses):\n" + "\n".join(profile_parts)
+    else:
+        # No preferences — behave normally, no forced assumptions
+        dynamic_prompt = SYSTEM_PROMPT
+
     messages = [{"role": "system", "content": dynamic_prompt}]
     for msg in history:
         messages.append({"role": msg["role"], "content": msg["content"]})

@@ -170,12 +170,14 @@ input, textarea { font-family: inherit; color: inherit; }
   position: relative;
   white-space: nowrap;
 }
-.nav-link::after {
+.nav-link-text {
+  position: relative;
+}
+.nav-link-text::after {
   content: '';
   position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: -2px;
+  left: 0;
   width: 0;
   height: 2px;
   background: var(--neon-green);
@@ -185,8 +187,8 @@ input, textarea { font-family: inherit; color: inherit; }
 .nav-link:hover {
   color: var(--neon-green);
 }
-.nav-link.active::after {
-  width: 60%;
+.nav-link.active .nav-link-text::after {
+  width: 100%;
 }
 
 .nav-toggle { display: none; flex-direction: column; gap: 5px; }
@@ -902,3 +904,69 @@ input, textarea { font-family: inherit; color: inherit; }
   .light-mode .pref-select:hover {
     border-color: var(--neon-cyan);
   }
+
+/* ── Context badge (shows active Grade / Subject) ── */
+.pref-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-family: 'Orbitron', monospace;
+  color: var(--neon-green);
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  white-space: nowrap;
+  animation: fadeSlideUp 0.3s ease;
+}
+
+/* ── Clear preferences button ── */
+.pref-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 600;
+  color: var(--neon-red);
+  background: rgba(255, 60, 80, 0.06);
+  border: 1px solid rgba(255, 60, 80, 0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.pref-clear-btn:hover {
+  background: rgba(255, 60, 80, 0.16);
+  box-shadow: 0 0 10px rgba(255, 60, 80, 0.25);
+}
+
+/* ── Follow-up nudge bubble ── */
+.pref-nudge {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  border-left-color: var(--neon-purple) !important;
+  background: rgba(168, 85, 247, 0.06) !important;
+  font-style: italic;
+}
+.pref-nudge strong {
+  color: var(--neon-purple) !important;
+}
+
+/* Ensure pref-controls wraps cleanly with new elements */
+.pref-controls {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Light mode adjustments */
+.light-mode .pref-badge {
+  color: #0a7a4a;
+  background: rgba(10, 122, 74, 0.06);
+  border-color: rgba(10, 122, 74, 0.2);
+}
+.light-mode .pref-clear-btn {
+  color: var(--neon-red);
+  background: rgba(255, 60, 80, 0.04);
+}
+

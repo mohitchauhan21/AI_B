@@ -12,7 +12,7 @@
 
   <!-- ── Optional Preferences Bar ── -->
   <div class="preferences-bar" id="preferencesBar">
-    <div class="pref-label">🎯 Optional Preferences:</div>
+    <div class="pref-label">🎯 Optional:</div>
     <div class="pref-controls">
       <select id="gradeSelect" class="pref-select">
         <option value="">Any Grade</option>
@@ -26,7 +26,9 @@
         <option value="Physics">Physics</option>
         <option value="Chemistry">Chemistry</option>
         <option value="Biology">Biology</option>
+        <option value="Earth Science">Earth Science</option>
       </select>
+      <!-- Context badge & clear button injected by JS -->
     </div>
   </div>
 
@@ -53,12 +55,12 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // FIX 3: Remove footer from index.html completely
+    // Remove footer from chat page
     const footer = document.getElementById("siteFooter");
     if (footer) footer.remove();
 
-    // FIX 4: Hide hero section on first chat
-    const chatForm = document.getElementById("chatForm");
+    // Hide hero section on first message
+    const chatForm   = document.getElementById("chatForm");
     const heroSection = document.querySelector(".hero-section");
     let isFirstMessage = true;
 
@@ -70,12 +72,84 @@
           heroSection.style.transition = "all 0.4s ease";
           heroSection.style.opacity = "0";
           heroSection.style.transform = "translateY(-20px)";
-          setTimeout(() => {
-            heroSection.style.display = "none";
-          }, 400);
+          setTimeout(() => { heroSection.style.display = "none"; }, 400);
         }
       });
     }
+
+    // ── Context State (sessionStorage — resets on full page refresh) ──
+    const gradeSelect   = document.getElementById("gradeSelect");
+    const subjectSelect = document.getElementById("subjectSelect");
+
+    // Restore any preferences saved this session
+    const savedGrade   = sessionStorage.getItem("scibot-grade")   || "";
+    const savedSubject = sessionStorage.getItem("scibot-subject") || "";
+    if (gradeSelect)   gradeSelect.value   = savedGrade;
+    if (subjectSelect) subjectSelect.value = savedSubject;
+
+    // Inject context badge + clear button into the pref-controls row
+    const prefControls = document.querySelector(".pref-controls");
+    if (prefControls) {
+      const badge = document.createElement("span");
+      badge.id = "contextBadge";
+      badge.className = "pref-badge";
+      badge.style.display = "none";
+      prefControls.appendChild(badge);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.id = "clearPrefsBtn";
+      clearBtn.className = "pref-clear-btn";
+      clearBtn.innerHTML = "✕ Clear";
+      clearBtn.title = "Reset preferences";
+      clearBtn.type = "button";
+      clearBtn.style.display = "none";
+      prefControls.appendChild(clearBtn);
+
+      clearBtn.addEventListener("click", () => {
+        gradeSelect.value   = "";
+        subjectSelect.value = "";
+        sessionStorage.removeItem("scibot-grade");
+        sessionStorage.removeItem("scibot-subject");
+        updateContextUI();
+      });
+    }
+
+    function updateContextUI() {
+      const grade    = gradeSelect   ? gradeSelect.value   : "";
+      const subject  = subjectSelect ? subjectSelect.value : "";
+      const badge    = document.getElementById("contextBadge");
+      const clearBtn = document.getElementById("clearPrefsBtn");
+      if (!badge || !clearBtn) return;
+
+      const parts = [];
+      if (grade)   parts.push(gradeSelect.options[gradeSelect.selectedIndex].text);
+      if (subject) parts.push(subject);
+
+      if (parts.length > 0) {
+        badge.textContent = "🟢 " + parts.join(" · ");
+        badge.style.display = "inline-flex";
+        clearBtn.style.display = "inline-flex";
+      } else {
+        badge.style.display = "none";
+        clearBtn.style.display = "none";
+      }
+    }
+
+    if (gradeSelect) {
+      gradeSelect.addEventListener("change", () => {
+        sessionStorage.setItem("scibot-grade", gradeSelect.value);
+        updateContextUI();
+      });
+    }
+    if (subjectSelect) {
+      subjectSelect.addEventListener("change", () => {
+        sessionStorage.setItem("scibot-subject", subjectSelect.value);
+        updateContextUI();
+      });
+    }
+
+    // Render badge for any restored values
+    updateContextUI();
   });
 </script>
 {% endblock %}
